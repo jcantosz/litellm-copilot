@@ -100,6 +100,17 @@ litellm-copilot --nightly
 
 The proxy runs on `http://localhost:4000` by default.
 
+## Docker Usage
+
+Prefer to run in Docker? See [DOCKER.md](DOCKER.md) for instructions on using Docker and docker-compose.
+
+Quick start:
+```bash
+# Set your token and start
+export GITHUB_TOKEN=ghp_your_token_here
+docker compose up
+```
+
 ## Using with AI Agents
 
 Configure your favorite AI tools to use the proxy. Add these to your shell profile or set them before running the tool.
