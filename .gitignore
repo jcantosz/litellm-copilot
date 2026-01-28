@@ -1,1 +1,3 @@
 .claude/settings.local.json
+.env
+github_token.txt
