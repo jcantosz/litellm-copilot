@@ -5,15 +5,15 @@ services:
       - "4000:4000"
     environment:
       # Option 1: Set GITHUB_TOKEN directly
-      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
-      # Option 2: Set COPILOT_PROXY_TOKEN_CMD to read from secret file
-      - COPILOT_PROXY_TOKEN_CMD=${COPILOT_PROXY_TOKEN_CMD:-}
+      - GITHUB_TOKEN
+      # Option 2: Set COPILOT_PROXY_TOKEN_CMD (requires custom image with CLI tools)
+      - COPILOT_PROXY_TOKEN_CMD
       - PORT=${PORT:-4000}
     volumes:
-      # Mount custom config if needed
+      # Mount custom config if needed (optional - default config.yaml is in the image)
       - ./config.yaml:/app/config.yaml:ro
     secrets:
-      # Optional: Use Docker secrets for token
+      # Option 3: Use Docker secrets for token (requires github_token file)
       - github_token
     restart: unless-stopped
 
