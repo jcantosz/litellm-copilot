@@ -1,22 +1,10 @@
 services:
   litellm-copilot:
     build: .
+    env_file: .env
     ports:
       - "4000:4000"
-    environment:
-      # Option 1: Set GITHUB_TOKEN directly
-      - GITHUB_TOKEN
-      # Option 2: Set COPILOT_PROXY_TOKEN_CMD (requires custom image with CLI tools)
-      - COPILOT_PROXY_TOKEN_CMD
-      - PORT=${PORT:-4000}
     volumes:
       # Mount custom config if needed (optional - default config.yaml is in the image)
       - ./config.yaml:/app/config.yaml:ro
-    secrets:
-      # Option 3: Use Docker secrets for token (requires github_token file)
-      - github_token
     restart: unless-stopped
-
-secrets:
-  github_token:
-    file: ${GITHUB_TOKEN_FILE:-./github_token.txt}

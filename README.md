@@ -106,8 +106,11 @@ Prefer to run in Docker? See [DOCKER.md](DOCKER.md) for instructions on using Do
 
 Quick start:
 ```bash
-# Set your token and start
-export GITHUB_TOKEN=ghp_your_token_here
+# Copy template and configure
+cp .env.tmpl .env
+# Edit .env to set GITHUB_TOKEN
+
+# Start the proxy
 docker compose up
 ```
 

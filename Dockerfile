@@ -10,24 +10,18 @@ COPY <<'EOF' /app/start.sh
 #!/bin/bash
 set -e
 
-# Handle token from various sources (in order of precedence)
-# 1. Docker secret file
-if [ -f /run/secrets/github_token ]; then
-  echo "Using token from Docker secret..."
-  export GITHUB_TOKEN=$(cat /run/secrets/github_token | tr -d '\n\r')
-# 2. Command to retrieve token (requires custom image with CLI tools)
-elif [ -n "$COPILOT_PROXY_TOKEN_CMD" ]; then
+# Handle token from environment variables (in order of precedence)
+# 1. GITHUB_TOKEN environment variable (preferred)
+if [ -z "$GITHUB_TOKEN" ] && [ -n "$COPILOT_PROXY_TOKEN_CMD" ]; then
+  # 2. Command to retrieve token (fallback, requires custom image with CLI tools)
   echo "Retrieving token using COPILOT_PROXY_TOKEN_CMD..."
   export GITHUB_TOKEN=$(eval "$COPILOT_PROXY_TOKEN_CMD")
 fi
 
-# 3. Verify we have a token from one of the above methods or GITHUB_TOKEN env var
+# Verify we have a token
 if [ -z "$GITHUB_TOKEN" ]; then
   echo "Error: No token found."
-  echo "Provide a token using one of these methods:"
-  echo "  1. Docker secret at /run/secrets/github_token"
-  echo "  2. COPILOT_PROXY_TOKEN_CMD environment variable (requires custom image with CLI tools)"
-  echo "  3. GITHUB_TOKEN environment variable"
+  echo "Set GITHUB_TOKEN in .env file or provide COPILOT_PROXY_TOKEN_CMD"
   exit 1
 fi
 

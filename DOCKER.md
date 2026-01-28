@@ -4,52 +4,39 @@ Run the litellm-copilot proxy using Docker and docker-compose.
 
 ## Quick Start
 
-### Option 1: Using Environment Variable
-
+1. Copy the template environment file:
 ```bash
-# Set your GitHub token
-export GITHUB_TOKEN=ghp_your_token_here
+cp .env.tmpl .env
+```
 
-# Start the proxy
+2. Edit `.env` and set your GitHub token:
+```bash
+GITHUB_TOKEN=ghp_your_token_here
+PORT=4000
+```
+
+3. Start the proxy:
+```bash
 docker compose up
 ```
 
-### Option 2: Using Docker Secrets (Recommended)
-
-```bash
-# Create a file with your token (no trailing newline)
-echo -n "ghp_your_token_here" > github_token.txt
-
-# Start the proxy
-docker compose up
-```
-
-### Option 3: Using Token Command (Requires Custom Image)
-
-**Note:** This option requires building a custom Docker image with the necessary CLI tools (like `op` for 1Password or `security` for macOS Keychain) installed. The base image doesn't include these tools.
-
-Example custom Dockerfile:
-```dockerfile
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
-
-# Install 1Password CLI (example)
-RUN curl -sSO https://downloads.1password.com/linux/debian/amd64/stable/1password-cli-amd64-latest.deb && \
-    dpkg -i 1password-cli-amd64-latest.deb && \
-    rm 1password-cli-amd64-latest.deb
-
-WORKDIR /app
-COPY config.yaml /app/config.yaml
-# ... rest of Dockerfile
-```
+The proxy will be available at `http://localhost:4000`.
 
 ## Configuration
 
 ### Environment Variables
 
-- `GITHUB_TOKEN` - Your GitHub Personal Access Token (direct)
-- `COPILOT_PROXY_TOKEN_CMD` - Command to retrieve token (requires custom image with CLI tools)
-- `GITHUB_TOKEN_FILE` - Host path to file containing token (default: `./github_token.txt`, mounted as `/run/secrets/github_token` in container)
+Configure these in your `.env` file:
+
+- `GITHUB_TOKEN` - Your GitHub Personal Access Token (required)
+- `COPILOT_PROXY_TOKEN_CMD` - Command to retrieve token (optional fallback, requires custom image with CLI tools)
 - `PORT` - Port to run proxy on (default: `4000`)
+
+### Token Authentication
+
+The startup script prefers `GITHUB_TOKEN` and falls back to `COPILOT_PROXY_TOKEN_CMD` if the token is not set.
+
+**Using COPILOT_PROXY_TOKEN_CMD** requires building a custom Docker image with the necessary CLI tools installed (like `op` for 1Password or `security` for macOS Keychain).
 
 ### Custom Configuration
 
@@ -106,9 +93,8 @@ docker compose down
 ### Common Issues
 
 **"No token found" error:**
-- Ensure `GITHUB_TOKEN` is set, OR
-- Create `github_token.txt` with your token (no trailing newline), OR  
-- Set `COPILOT_PROXY_TOKEN_CMD` with a custom image that has the CLI tools installed
+- Ensure `GITHUB_TOKEN` is set in your `.env` file, OR
+- Set `COPILOT_PROXY_TOKEN_CMD` in `.env` (requires custom image with CLI tools installed)
 
 **Config file mount fails:**
 - If you don't have a custom config, remove the volume mount from `docker-compose.yml` to use the default config from the image
